@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data >
+        <record id="wb_account_invoice_view" model="ir.ui.view">
+            <field name="name">Account Invoice</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_term_id']"  position="after">
+                    <field name="contract_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="wb_account_invoice_supplier_view" model="ir.ui.view">
+            <field name="name">Account Invoice</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_due']"  position="after">
+                    <field name="labor_contract_id"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="wb_account_payment_line_view" model="ir.ui.view">
+            <field name="name">Account Payment</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group/group[2]" position="after">
+                    <notebook colspan="4">
+                        <page string="分包合同明细" attrs="{'invisible':[('partner_type', '=', 'customer')]}">
+                            <field name="actual_line" >
+                                <tree string="分包" editable="bottom">
+                                    <field name="labor_contract_id" domain="[('state','not in', ('draft','cancel')),('state_running','!=','cancel')]" required="1" on_change="onchange_labor_contract_id(labor_contract_id)"/>
+                                    <field name="project_id" />
+                                    <field name="payment_name_id" context="{'labor_contract_id':labor_contract_id}"/>
+                                    <field name="contract_total" />
+                                    <field name="payment_total" required="1"  on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="总包合同明细" attrs="{'invisible':[('partner_type', '=', 'supplier')]}">
+                            <field name="market_actual_line" >
+                                <tree string="总包" editable="bottom">
+                                    <field name="market_contract_id" required="1" domain="[('state','not in', ('draft','cancel')),('state_running','!=','cancel')]" on_change="onchange_market_contract_id(market_contract_id)"/>
+                                    <field name="project_id" />
+                                    <field name="payment_name_id" context="{'market_contract_id':market_contract_id}"/>
+                                    <field name="contract_total" />
+                                    <field name="payment_total" required="1" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+
+   </data>
+</openerp>

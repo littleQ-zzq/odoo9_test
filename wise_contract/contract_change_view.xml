@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data >
+
+        <!--合同变更-->
+        <record model="ir.ui.view" id="wb_market_contract_change_tree">
+            <field name="name">合同变更</field>
+            <field name="model">market.contract.change</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Contract Change">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="market_contract_id"/>
+                    <field name="currency_id"/>
+                    <field name="change_amount"/>
+                    <field name="originator_id"/>
+                    <field name="originator_date"/>
+                    <field name="notes"/>
+                    <field name="active" invisible="1"/> 
+                </tree>
+            </field>
+        </record>
+
+         <record model="ir.ui.view" id="wb_market_contract_change_form">
+            <field name="name">合同变更</field>
+            <field name="model">market.contract.change</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="YongJin Shaoshi">
+                    
+                    <header>
+                        <button name="market_contract_change_draft_confirm" string="提交" states="draft" class="oe_highlight" groups="wise_project.wb_market_user"/>
+                        <button name="market_contract_change_source_approve" string="(source)同意" type="workflow_ok"  states="confirm" class="oe_highlight" groups="wise_project.wb_purchase_manager"/>
+                        <button name="market_contract_change_source_reject" string="拒绝" type="workflow_no" states="confirm" class="oe_highlight"
+                                        groups="wise_project.wb_purchase_manager"/>
+                        <button name="market_contract_change_design_approve" string="(design)同意" type="workflow_ok"  states="confirm" class="oe_highlight" 
+                                        groups="wise_project.wb_design_lowN_manager"/>
+                        <button name="market_contract_change_design_reject" string="拒绝" type="workflow_no" states="confirm" class="oe_highlight"
+                                        groups="wise_project.wb_design_lowN_manager"/>
+                        <button name="market_contract_change_financial_approve" string="(financial)同意" type="workflow_ok"  states="confirm" class="oe_highlight" groups="wise_project.wb_finance_manager"/>
+                        <button name="market_contract_change_financial_reject" string="拒绝" type="workflow_no" states="confirm" class="oe_highlight" groups="wise_project.wb_finance_manager"/>
+                        <button name="market_contract_change_approve_done" string="(boss)同意" type="workflow_ok"  states="dummy_sum" class="oe_highlight" groups="wise_project.wb_leader"/>
+                        <button name="market_contract_change_approve_reject" string="拒绝" type="workflow_no" states="dummy_sum" class="oe_highlight" groups="wise_project.wb_leader"/>
+                        <button name='attachment_tree_view' type='object' string='合同附件'/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,dummy_sum,done" 
+                                       attrs="{'invisible': [('state','=','done')]}" />
+                        <button name="wkf_running_done" string="结算" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <button name="wkf_running_done" string="完成" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <button name="wkf_running_cancle" string="取消" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <field name="state_running" widget="statusbar"   statusbar_visible="running,finished,cancel"
+                                       attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                    </header>
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        </h1>
+                        <group>
+                            <group>
+                                <field name="code"/>
+                                <field name="market_contract_id" domain="[('state', '=', 'done')]" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="originator_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </group> 
+                            <group>
+                                <field name="currency_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="change_amount" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="originator_date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="active" invisible="1"/> 
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="备注">
+                                <field name="notes" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </page>
+                            <page string="审批记录">
+                                <field name="wkf_logs">
+                                    <tree string="wkf_logs" >
+                                        <field name="job_id" />
+                                        <field name="employee_id" />
+                                        <field name="time" />
+                                        <field name="status" />
+                                        <field name="info" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div> 
+                </form>
+            </field>
+        </record>
+
+        <record id="wb_market_contract_change_search" model="ir.ui.view">
+            <field name="name">Search</field>
+            <field name="model">market.contract.change</field>
+            <field name="arch" type="xml">
+                <search string="搜索">
+                    <field name="name" string="名称" filter_domain="[('name','ilike',self)]"/>
+                    <group expand="0" string="Group By..." colspan="16">
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_wb_market_contract_change">
+            <field name="name">合同变更</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">market.contract.change</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="wb_market_contract_change_tree"/>
+        </record>
+         
+        <record id='action_wb_market_contract_change_filter' model='ir.actions.act_window'>
+            <field name='name'>待我审批的合同变更</field>
+            <field name='type'>ir.actions.act_window</field>
+            <field name='res_model'>market.contract.change</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+            <field name="context">{'wkf_filter': 'MYTODO'}</field>
+            
+        </record>       
+
+        <!--补充合同后可编辑的总包合同-->
+        <record id="wb_write_market_contract_form_view" model="ir.ui.view">
+            <field name="name">market.contract.form</field>
+            <field name="model">market.contract</field>
+            <field name="arch" type="xml">
+                <form string="Contract" >
+                    <header>
+                        <button name='attachment_tree_view' type='object' string='合同附件'/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,dummy_sum,done" 
+                               attrs="{'invisible': [('state','=','done')]}" />
+                        <field name="state_running" widget="statusbar"   statusbar_visible="running,finished,cancel"
+                               attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                    </header>
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline" attrs="{'readonly':[('state','!=','draft')]}" placeholder="合同名称"/>
+                        </h1>
+                        <group colspan="4">
+                            <group >
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <field name="code"/>
+                                <field name="project_id" readonly="1"/>
+                                <field name="party_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="party_b" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_b" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="currency_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_amount" on_change='onchange_contract_amount(contract_amount)' attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="now_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <field name="other_fees" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="otherfees_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="retention_ratio" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="advance_paymentratio" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="advance_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="retention_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_person" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                        </group>
+                    <notebook>
+                        <page string="收款计划">
+                            <field name="market_labor_line" context="{'contract_amount':contract_amount}">
+                                <tree string="LaborContract" editable="bottom">
+                                    <field name="paymentitem_id"/>
+                                    <field name="payment_condition"/>
+                                    <field name="payment_date"/>
+                                    <field name="payment_ration"/>
+                                    <field name="actual_payment" on_change="onchange_payment_ratio(actual_payment)" context="{'contract_amount':contract_amount}"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="实际收款">
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="market_contract_id" on_change="onchange_market_contract_id(market_contract_id)" />
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_tax" readonly='1'/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="发票管理">
+                            <field name="invoice" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="Invoice" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_invoice"/>
+                                    <field name="number"/>
+                                    <field name="amount_total"/>
+                                    <field name="state" invisible='1'/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="合同变更">
+                            <field name="market_change_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ChangeContract" editable="bottom">
+                                    <field name="code" />
+                                    <field name="name" />
+                                    <field name="originator_date" string="日期"/>
+                                    <field name="change_amount" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="文档附件明细">
+                            <field name="scon_docu">
+                                <tree string="tech document">
+                                    <field name="name"/>
+                                    <field name="datas_fname"/>
+                                    <field name="type"/>
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="datas"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="备注">
+                            <field name="remark" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </page>
+                    </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id='action_wb_market_contract_change_show' model='ir.actions.act_window'>
+            <field name='name'>商务合同</field>
+            <field name='type'>ir.actions.act_window</field>
+            <field name='res_model'>market.contract</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+
+        <record id="action_wb_write_market_contract_tree" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="wb_market_contract_tree_view"/>
+            <field name="act_window_id" ref="action_wb_market_contract_change_show"/>
+        </record>
+        <record id="action_wb_write_market_contract_form" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wb_write_market_contract_form_view"/>
+            <field name="act_window_id" ref="action_wb_market_contract_change_show"/>
+        </record>
+
+    </data>
+</openerp>        

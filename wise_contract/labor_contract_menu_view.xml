@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data >
+        <menuitem id="menu_contract_root" name="合同" sequence="10" groups="wise_project.wb_finance_user,wise_project.wb_finance_manager,wise_project.wb_leader"/>
+        <menuitem id="menu_market_contract_root" name="商务总包合同" parent="menu_contract_root" sequence="10"/>
+        <menuitem id="menu_market_contract" name="商务总包合同" parent="menu_market_contract_root" action="wb_market_contract_show" sequence="10"/>
+        <menuitem id="menu_market_contract_change" name="合同变更" parent="menu_market_contract_root" action="action_wb_market_contract_change" sequence="60"/>
+        <menuitem id="menu_wb_market_contract_change_show" name="分摊变更金额合同" parent="menu_market_contract_root" action="action_wb_market_contract_change_show" sequence="70"/>
+
+        <menuitem id="menu_labor_contract1" name="分包合同" parent="menu_contract_root" sequence="20"/>
+        <menuitem id="menu_before_purchase_contract" name="预合同" 
+                    parent="menu_labor_contract1" action="action_before_purchase_contract_form"  sequence="9"/>
+        <menuitem id="menu_purchase_contract" name="采购合同" 
+                    parent="menu_labor_contract1" action="action_purchase_contract_form"  sequence="10"/>
+        <menuitem id="menu_construction_contract" name="施工合同" 
+                    parent="menu_labor_contract1" action="action_construction_contract_form"  sequence="20"/>
+        <menuitem id="menu_design_contract" name="设计合同" 
+                    parent="menu_labor_contract1" action="action_design_contract_form"  sequence="30"/>
+
+        <menuitem id="menu_setting_root" name="配置" parent="menu_contract_root"  sequence="30"/>
+        <menuitem id="menu_payment_item" name="款项名称" parent="menu_setting_root"  action="wb_payment_item_show" sequence="10"/>
+
+        <menuitem id="menu_wait_approve_root" name="待我审批" parent="menu_contract_root" sequence="40"/>
+        <menuitem id="menu_approve_design_contract" name="设计合同" 
+                    parent="menu_wait_approve_root" action="action_design_contract_form_filter"  sequence="10"/>
+        <menuitem id="menu_approve_labor_contract" name="施工合同" 
+                    parent="menu_wait_approve_root" action="action_construction_contract_form_filter"  sequence="20"/>
+        <menuitem id="menu_approve_purchase_contract" name="采购合同" 
+                    parent="menu_wait_approve_root" action="action_purchase_contract_form_filter"  sequence="30"/>
+        <menuitem id="menu_approve_market_contract" name="商务总包合同" 
+                    parent="menu_wait_approve_root" action="wb_market_contract_show_filter"  sequence="40"/>
+        <menuitem id="menu_approve_market_contract_change" name="合同变更" 
+                    parent="menu_wait_approve_root" action="action_wb_market_contract_change_filter"  sequence="50"/>
+
+        <menuitem id="menu_contract_form_guarantee" name="质保金合同" parent="menu_contract_root" sequence="50"/>
+        <menuitem id="menu_contract_form_guarantee_all_cost" name="质保金已交合同" parent="menu_contract_form_guarantee" action="action_contract_form_guarantee_all_cost"  sequence="10"/>
+        <menuitem id="menu_contract_form_guarantee_only_cost" name="非质保金已交合同" parent="menu_contract_form_guarantee" action="action_contract_form_guarantee_only_cost"  sequence="20"/>
+        <menuitem id="menu_contract_form_guarantee_less_cost" name="金额未交齐合同" parent="menu_contract_form_guarantee" action="action_contract_form_guarantee_less_cost"  sequence="30"/>
+
+    </data>
+</openerp>

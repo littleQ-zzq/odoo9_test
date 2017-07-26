@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="wb_change_fields_tree">
+            <field name="name">wise.change.fields.tree</field>
+            <field name="model">wise.change.fields</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Change Fields">
+                    <field name="name"/>
+                    <field name="model_id"/>
+                    <field name="line_id"/>
+                    <field name="state"/>
+                    <field name="change_state"/>
+                    <field name="active" invisible="1"/>               
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="wb_change_fields_form">
+            <field name="name">wise.change.fields.form</field>
+            <field name="model">wise.change.fields</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Change Fields">
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                        <group>
+                            <group>
+                                <field name="model_id" on_change="onchange_model_id(model_id)"/>
+                                <field name="line_id" on_change="onchange_line_id(model_id,line_id)"/>
+                            </group>  
+                            <group>
+                                <field name="state" />
+                                <field name="change_state" />
+                                <field name="active" invisible="1"/>
+                            </group>  
+                        </group>
+                    </sheet>
+<!--                     <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>  -->
+                </form>
+            </field>
+        </record>        
+
+        <record model="ir.actions.act_window" id="action_change_fields">
+            <field name="name">Change Fields</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wise.change.fields</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="wb_change_fields_tree"/>
+        </record>
+
+
+        <menuitem id="menu_wb_system_document" name="系统管理" sequence="22"/>
+        <menuitem id="menu_model_data_document" name="模块数据管理" parent="menu_wb_system_document" sequence="10"/>
+        <menuitem action="action_change_fields" id="menu_wb_change_fields" name="状态修改" parent="menu_model_data_document" sequence="10"/>
+
+    </data>
+</openerp>

@@ -1,0 +1,1254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="wb_inherit_project_view" model="ir.ui.view">
+            <field name="name">Project Inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='user_id']"  position="after">
+                        <field name="market_contract_id"/>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+        <!-- 预合同Form -->
+        <record id="before_purchase_contract_form" model="ir.ui.view">
+            <field name="name">labor.contract.form</field>
+            <field name="model">labor.contract</field>
+            <field name="arch" type="xml">
+                <form string="Purchase Contract" >
+                    <header>
+                        <button name="wkf_to_draft" string="预合同提交" type='object' states="before_draft" class="oe_highlight"/>
+                        <button name='attachment_tree_view' type='object' string='合同附件'/>
+                        <field name="state" widget="statusbar" statusbar_visible="before_draft" />
+                    </header>
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline" placeholder="合同名称"/>
+                        </h1>
+                        <group colspan="4">
+                            <group >
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <field name="code"/>
+                                <field name="project_id" />
+                                <field name="contract_type"/>
+                                <field name="currency_id"/>
+
+                                <field name="party_a"/>
+                                <field name="headparty_a"/>
+                                <field name="party_b"/>
+                                <field name="headparty_b"/>
+                                <field name="contract_amount"/>
+                                <field name="quality_control_plan"/>
+                            </group>
+                            <group colspan="2" col="4">
+<!--                                 <field name="advance_amount" on_change="onchange_advance_paymentratio(advance_amount,contract_amount)"/>
+                                <field name="advance_paymentratio" />
+                                <field name="retention_amount" on_change="onchange_retention_ratio(retention_amount,contract_amount)"/>
+                                <field name="retention_ratio" /> -->
+                                <field name="other_fees" />
+                                <field name="otherfees_amount"/>
+                                <field name="input_person" />
+                                <field name="input_date" />
+                            </group>
+                        </group>
+                    <notebook>
+                        <page string="合同产品明细">
+                            <field name="pr_line" >
+                                <tree string="ProductContract" editable="bottom">
+                                    <field name="product_id" on_change="onchange_product_id(product_id,False, context)"/>
+                                    <field name="name"/>
+                                    <field name="product_qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal"/>
+                                    <field name="active" invisible="1"/>
+                                  </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="product_lines_total"/>
+                                </div>
+                                <field name="product_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>  
+                        </page>
+                        <page string="付款计划/实际付款">
+                            <field name="labor_line" context="{'contract_amount':contract_amount}">
+                                <tree string="LaborContract" editable="bottom">
+                                    <field name="paymentitem_id"/>
+                                    <field name="payment_condition"/>
+                                    <field name="payment_date"/>
+                                    <field name="actual_payment" on_change="onchange_payment_ratio(actual_payment)" context="{'contract_amount':contract_amount}"/>
+                                    <field name="payment_ration"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">                                    
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)"/>
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="payment_lines_total"/>
+                                </div>
+                                <field name="payment_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group> 
+                        </page>
+<!--                         <page string="实际付款">
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">                                    
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)"/>
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                        </page> -->
+                        <page string="发票管理">
+                            <field name="invoice">
+                                <tree string="Invoice" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_invoice"/>
+                                    <field name="number"/>
+                                    <field name="amount_total"/>
+                                    <field name="state" invisible='1'/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="合同变更">
+                            <field name="change_line">
+                                <tree string="ChangeContract" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="文档附件明细">
+                            <field name="con_docu" >
+                                <tree string="tech document">
+                                    <field name="name"/>
+                                    <field name="datas_fname"/>
+                                    <field name="type"/>
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="datas"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="备注">
+                            <field name="remark"/>
+                        </page>
+                    </notebook>
+                    </sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+
+                </form>
+            </field>
+        </record>
+
+        <!--预合同 Tree-->
+        <record id="before_purchase_contract_tree" model="ir.ui.view">
+            <field name="name">labor.contract.tree</field>
+            <field name="model">labor.contract</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Purchase Contract">
+                    <field name="name" />
+                    <field name="project_id"/>
+                    <field name="contract_amount"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- 预合同actions -->
+        <record id="action_before_purchase_contract_form" model="ir.actions.act_window">
+            <field name="name">预合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="before_purchase_contract_tree"/>
+            <field name="domain">[('state','=','before_draft')]</field>
+            <field name="context">{'change_state':'1'}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_before_purchase_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="before_purchase_contract_tree"/>
+            <field name="act_window_id" ref="action_before_purchase_contract_form"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_tecway_project_equipment_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="before_purchase_contract_form"/>
+            <field name="act_window_id" ref="action_before_purchase_contract_form"/>
+        </record>
+
+        <!--Purchase Form-->
+        <record id="purchase_contract_form" model="ir.ui.view">
+            <field name="name">labor.contract.form</field>
+            <field name="model">labor.contract</field>
+            <field name="arch" type="xml">
+                <form string="Purchase Contract">
+                    <header>
+                        <button name="labor_contract_draft_confirm" string="(purchase)提交" type="workflow_submit" states="draft" class="oe_highlight" />
+
+                        <button name="labor_contract_purchase_check_dummy" string="(purchase)同意"  states="confirm" 
+                                type="workflow_ok" class="oe_highlight" groups="wise_project.wb_purchase_manager"/>
+                        <button name="labor_contract_dummy_purchase_draft" string="(purchase)拒绝"  states="confirm" 
+                                type="workflow_no" class="oe_highlight" groups="wise_project.wb_purchase_manager"/>
+
+                        <button name="labor_contract_purchase_director_done" string="(director)同意" states="wait_director" 
+                                type="workflow_ok" class="oe_highlight" groups="wise_project.wb_leader"/>                                               
+                        <button name="labor_contract_purchase_director_draft" string="(director)拒绝" states="wait_director"  
+                                type="workflow_no" class="oe_highlight" groups="wise_project.wb_leader"/>
+                                
+                        <button name='attachment_tree_view' type='object' string='合同附件'/>    
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done" attrs="{'invisible':[('state','=','done')]}"/>
+<!--                         <button name="wkf_running_done" string="结算" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/> -->
+                        <button name="wkf_running_done" string="完成" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <button name="wkf_running_cancle" string="取消" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+       
+                        
+                        <field name="state_running" widget="statusbar"   statusbar_visible="running,finished,cancel" 
+                               attrs="{'invisible': [('state', '!=', 'done')]}"/>
+
+                    </header>
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline" attrs="{'readonly':[('state','!=','draft')]}" placeholder="合同名称"/>
+                        </h1>
+                        <group colspan="4">
+                            <group >
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <field name="code"/>
+                                <field name="project_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_type" />
+                                <field name="currency_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+
+                                <field name="party_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="party_b" domain="[('category_id','ilike','产品')]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_b" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="quality_control_plan" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                            <group colspan="2" col="4">
+<!--                                 <field name="advance_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_advance_paymentratio(advance_amount,contract_amount)"/>
+                                <field name="advance_paymentratio" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="retention_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_retention_ratio(retention_amount,contract_amount)"/>
+                                <field name="retention_ratio" attrs="{'readonly':[('state','!=','draft')]}"/> -->
+                                <field name="other_fees" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="otherfees_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_person" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                        </group>
+                    <notebook>
+                        <page string="合同产品明细">
+                            <field name="pr_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ProductContract" editable="bottom">
+                                    <field name="product_id" domain="[('cost_control_type','=','source')]" on_change="onchange_product_id(product_id,False, context)"/>
+                                    <field name="name"/>
+                                    <field name="product_qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal"/>
+                                    <field name="active" invisible="1"/>
+                                  </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="product_lines_total"/>
+                                </div>
+                                <field name="product_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>  
+                        </page>
+                        <page string="付款计划/实际付款">
+                            <field name="labor_line" attrs="{'readonly':[('state','!=','draft')]}" context="{'contract_amount':contract_amount}">
+                                <tree string="LaborContract" editable="bottom">
+                                    <field name="paymentitem_id"/>
+                                    <field name="payment_condition"/>
+                                    <field name="payment_date"/>
+                                    <field name="actual_payment" on_change="onchange_payment_ratio(actual_payment)" context="{'contract_amount':contract_amount}"/>
+                                    <field name="payment_ration"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)"/>
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="payment_lines_total"/>
+                                </div>
+                                <field name="payment_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>                            
+                        </page>
+<!--                         <page string="实际付款">
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)"/>
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                        </page> -->
+                        <page string="发票管理">
+                            <field name="invoice" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="Invoice" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_invoice"/>
+                                    <field name="number"/>
+                                    <field name="amount_total"/>
+                                    <field name="state" invisible='1'/>
+
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="合同变更">
+                            <field name="change_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ChangeContract" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="文档附件明细">
+                            <field name="con_docu" >
+                                <tree string="tech document">
+                                    <field name="name"/>
+                                    <field name="datas_fname"/>
+                                    <field name="type"/>
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="datas"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="备注">
+                            <field name="remark" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </page>
+                        <page string="审批记录">
+                            <field name="wkf_logs" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="wkf_logs" >
+                                    <field name="job_id" />
+                                    <field name="employee_id" />
+                                    <field name="time" />
+                                    <field name="status" />
+                                    <field name="info" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    </sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+
+                </form>
+            </field>
+        </record>
+
+        <!--Purchase Tree-->
+        <record id="purchase_contract_tree" model="ir.ui.view">
+            <field name="name">labor.contract.tree</field>
+            <field name="model">labor.contract</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Purchase Contract">
+                    <field name="name" />
+                    <field name="project_id"/>
+                    <field name="contract_amount"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- 采购部actions -->
+        <record id="action_purchase_contract_form" model="ir.actions.act_window">
+            <field name="name">采购合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="purchase_contract_tree"/>
+            <field name="domain">[('contract_type','=','purchase'),('state','in',['draft','confirm','wait_director','done'])]</field>
+            <field name="context">{'default_contract_type':'purchase'}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_purchase_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="purchase_contract_tree"/>
+            <field name="act_window_id" ref="action_purchase_contract_form"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_purchase_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="purchase_contract_form"/>
+            <field name="act_window_id" ref="action_purchase_contract_form"/>
+        </record>
+
+        <!-- 待我审批 -->
+        <record id="action_purchase_contract_form_filter" model="ir.actions.act_window">
+            <field name="name">采购合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="purchase_contract_tree"/>
+            <field name="domain">[('contract_type','=','purchase'),('state','in',['draft','confirm','wait_director','done'])]</field>
+            <field name="context">{'wkf_filter': 'MYTODO','default_contract_type':'purchase'}</field>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_purchase_tree_filter_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="purchase_contract_tree"/>
+            <field name="act_window_id" ref="action_purchase_contract_form_filter"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_purchase_form_filter_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="purchase_contract_form"/>
+            <field name="act_window_id" ref="action_purchase_contract_form_filter"/>
+        </record>
+        <!-- Construction Form -->
+        <record id="construction_contract_form" model="ir.ui.view">
+            <field name="name">labor.contract.form</field>
+            <field name="model">labor.contract</field>
+            <field name="arch" type="xml">
+                <form string="Construction Contract" >
+                    <header>
+                        <button name="labor_contract_draft_confirm" string="(construct)提交" type="workflow_submit" states="draft" class="oe_highlight" />
+
+                        <button name="labor_contract_construct_check_dummy" string="(construct)同意"  states="confirm" 
+                                type="workflow_ok" class="oe_highlight" groups="wise_project.wb_construct_lowN_manager"/>
+                        <button name="labor_contract_dummy_construct_draft" string="(construct)拒绝"  states="confirm" 
+                                type="workflow_no" class="oe_highlight" groups="wise_project.wb_construct_lowN_manager"/>
+
+                        <button name="labor_contract_construct_director_done" string="(director)同意" states="wait_director" 
+                                type="workflow_ok" class="oe_highlight" groups="wise_project.wb_leader"/>                                               
+                        <button name="labor_contract_construct_director_draft" string="(director)拒绝" states="wait_director"  
+                                type="workflow_no" class="oe_highlight" groups="wise_project.wb_leader"/>
+                                
+                        <button name='attachment_tree_view' type='object' string='合同附件'/>    
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done" attrs="{'invisible':[('state','=','done')]}"/>
+<!--                         <button name="wkf_running_done" string="结算" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/> -->
+                        <button name="wkf_running_done" string="完成" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <button name="wkf_running_cancle" string="取消" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+       
+                        
+                        <field name="state_running" widget="statusbar"   statusbar_visible="running,finished,cancel" 
+                               attrs="{'invisible': [('state', '!=', 'done')]}"/>
+
+                    </header>
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline" attrs="{'readonly':[('state','!=','draft')]}" placeholder="合同名称"/>
+                        </h1>
+                        <group colspan="4">
+                            <group >
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <field name="code"/>
+                                <field name="project_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_type" />
+                                <field name="currency_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="party_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="party_b" domain="[('category_id','ilike','施工')]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_b" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="quality_control_plan" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                            <group colspan="2" col="4">
+<!--                                 <field name="advance_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_advance_paymentratio(advance_amount,contract_amount)"/>
+                                <field name="advance_paymentratio" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="retention_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_retention_ratio(retention_amount,contract_amount)"/>
+                                <field name="retention_ratio" attrs="{'readonly':[('state','!=','draft')]}"/> -->
+                                <field name="other_fees" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="otherfees_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_person" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                        </group>
+                    <notebook>
+                       <page string="合同产品明细">
+                            <field name="pr_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ProductContract" editable="bottom">
+                                    <field name="product_id" domain="[('cost_control_type','=','construction')]" on_change="onchange_product_id(product_id,False, context)"/>
+                                    <field name="name"/>
+                                    <field name="product_qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal"/>
+                                    <field name="active" invisible="1"/>
+                                  </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="product_lines_total"/>
+                                </div>
+                                <field name="product_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>        
+                        </page>
+                        <page string="付款计划/实际付款">
+                            <field name="labor_line" attrs="{'readonly':[('state','!=','draft')]}" context="{'contract_amount':contract_amount}">
+                                <tree string="LaborContract" editable="bottom">
+                                    <field name="paymentitem_id"/>
+                                    <field name="payment_condition"/>
+                                    <field name="payment_date"/>
+                                    <field name="actual_payment" on_change="onchange_payment_ratio(actual_payment)" context="{'contract_amount':contract_amount}"/>
+                                    <field name="payment_ration"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)" />
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="payment_lines_total"/>
+                                </div>
+                                <field name="payment_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group> 
+                        </page>
+<!--                         <page string="实际付款">
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)" />
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                        </page> -->
+                        <page string="发票管理">
+                            <field name="invoice" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="Invoice" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_invoice"/>
+                                    <field name="number"/>
+                                    <field name="amount_total"/>
+                                    <field name="state" invisible='1'/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="合同变更">
+                            <field name="change_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ChangeContract" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="文档附件明细">
+                            <field name="con_docu">
+                                <tree string="tech document">
+                                    <field name="name"/>
+                                    <field name="datas_fname"/>
+                                    <field name="type"/>
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="datas"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="备注">
+                            <field name="remark" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </page>
+                        <page string="审批记录">
+                            <field name="wkf_logs" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="wkf_logs" >
+                                    <field name="job_id" />
+                                    <field name="employee_id" />
+                                    <field name="time" />
+                                    <field name="status" />
+                                    <field name="info" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!--Construction Tree-->
+        <record id="construction_contract_tree" model="ir.ui.view">
+            <field name="name">labor.contract.tree</field>
+            <field name="model">labor.contract</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Construction Contract">
+                    <field name="name" />
+                    <field name="project_id"/>
+                    <field name="contract_amount"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--Construction Action-->
+        <record id="action_construction_contract_form" model="ir.actions.act_window">
+            <field name="name">施工合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="construction_contract_tree"/>
+            <field name="domain">[('contract_type','=','construct'),('state','in',['draft','confirm','wait_director','done'])]</field>
+            <field name="context">{'default_contract_type':'construct'}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_construct_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="construction_contract_tree"/>
+            <field name="act_window_id" ref="action_construction_contract_form"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_construct_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="construction_contract_form"/>
+            <field name="act_window_id" ref="action_construction_contract_form"/>
+        </record>
+
+        <!--Construction 待我审批-->
+        <record id="action_construction_contract_form_filter" model="ir.actions.act_window">
+            <field name="name">施工合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="construction_contract_tree"/>
+            <field name="domain">[('contract_type','=','construct'),('state','in',['draft','confirm','wait_director','done'])]</field>
+            <field name="context">{'wkf_filter': 'MYTODO','default_contract_type':'construct'}</field>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_construct_tree_filter_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="construction_contract_tree"/>
+            <field name="act_window_id" ref="action_construction_contract_form_filter"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_construct_form_filter_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="construction_contract_form"/>
+            <field name="act_window_id" ref="action_construction_contract_form_filter"/>
+        </record>
+
+        <!--Design Form-->
+        <record id="design_contract_form" model="ir.ui.view">
+            <field name="name">labor.contract.form</field>
+            <field name="model">labor.contract</field>
+            <field name="arch" type="xml">
+                <form string="LaborContract" >
+                   <header>
+                        <button name="labor_contract_draft_confirm" string="(design)提交" type="workflow_submit" states="draft" class="oe_highlight" />
+
+                        <button name="labor_contract_design_check_dummy" string="(design)同意"  states="confirm" 
+                                type="workflow_ok" class="oe_highlight" groups="wise_project.wb_design_lowN_manager"/>
+                        <button name="labor_contract_dummy_design_draft" string="(design)拒绝"  states="confirm" 
+                                type="workflow_no" class="oe_highlight" groups="wise_project.wb_design_lowN_manager"/>
+
+                        <button name="labor_contract_design_director_done" string="(director)同意" states="wait_director" 
+                                type="workflow_ok" class="oe_highlight" groups="wise_project.wb_leader"/>                                               
+                        <button name="labor_contract_design_director_draft" string="(director)拒绝" states="wait_director"  
+                                type="workflow_no" class="oe_highlight" groups="wise_project.wb_leader"/>
+                                
+                        <button name='attachment_tree_view' type='object' string='合同附件'/>    
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done" attrs="{'invisible':[('state','=','done')]}"/>
+<!--                         <button name="wkf_running_done" string="结算" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/> -->
+                        <button name="wkf_running_done" string="完成" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <button name="wkf_running_cancle" string="取消" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+       
+                        
+                        <field name="state_running" widget="statusbar"   statusbar_visible="running,finished,cancel" 
+                               attrs="{'invisible': [('state', '!=', 'done')]}"/>
+
+                    </header>
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline" attrs="{'readonly':[('state','!=','draft')]}" placeholder="合同名称"/>
+                        </h1>
+                        <group colspan="4">
+                            <group >
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <field name="code"/>
+                                <field name="project_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_type"/>
+                                <field name="currency_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+
+                                <field name="party_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="party_b" domain="[('category_id','ilike','设计')]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_b" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="quality_control_plan" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                            <group colspan="2" col="4">
+<!--                                 <field name="advance_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_advance_paymentratio(advance_amount,contract_amount)"/>
+                                <field name="advance_paymentratio" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="retention_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_retention_ratio(retention_amount,contract_amount)"/>
+                                <field name="retention_ratio" attrs="{'readonly':[('state','!=','draft')]}"/> -->
+                                <field name="other_fees" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="otherfees_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_person" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                        </group>
+                    <notebook>
+                        <page string="合同产品明细">
+                            <field name="pr_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ProductContract" editable="bottom">
+                                    <field name="product_id" domain="[('cost_control_type','=','design')]" on_change="onchange_product_id(product_id,False, context)"/>
+                                    <field name="name"/>
+                                    <field name="product_qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal"/>
+                                    <field name="active" invisible="1"/>
+                                  </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="product_lines_total"/>
+                                </div>
+                                <field name="product_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>  
+                        </page>
+                        <page string="付款计划/实际付款">
+                            <field name="labor_line" attrs="{'readonly':[('state','!=','draft')]}" context="{'contract_amount':contract_amount}">
+                                <tree string="LaborContract" editable="bottom">
+                                    <field name="paymentitem_id"/>
+                                    <field name="payment_condition"/>
+                                    <field name="payment_date"/>
+                                    <field name="actual_payment" on_change="onchange_payment_ratio(actual_payment)" context="{'contract_amount':contract_amount}"/>
+                                    <field name="payment_ration"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)"/>
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="payment_lines_total"/>
+                                </div>
+                                <field name="payment_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group> 
+                        </page>
+<!--                         <page string="实际付款">
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="labor_contract_id" on_change="onchange_labor_contract_id(labor_contract_id)"/>
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                        </page> -->
+                        <page string="发票管理">
+                            <field name="invoice" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="Invoice" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_invoice"/>
+                                    <field name="number"/>
+                                    <field name="amount_total"/>
+                                    <field name="state" invisible='1'/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="合同变更">
+                            <field name="change_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ChangeContract" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="文档附件明细">
+                            <field name="con_docu">
+                                <tree string="tech document">
+                                    <field name="name"/>
+                                    <field name="datas_fname"/>
+                                    <field name="type"/>
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="datas"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="备注">
+                            <field name="remark" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </page>
+                        <page string="审批记录">
+                            <field name="wkf_logs" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="wkf_logs" >
+                                    <field name="job_id" />
+                                    <field name="employee_id" />
+                                    <field name="time" />
+                                    <field name="status" />
+                                    <field name="info" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    </sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+
+                </form>
+            </field>
+        </record>
+
+        <!-- tree view -->
+        <record id="design_contract_tree" model="ir.ui.view">
+            <field name="name">labor.contract.tree</field>
+            <field name="model">labor.contract</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="LaborContract">
+                    <field name="name" />
+                    <field name="project_id"/>
+                    <field name="contract_amount"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- 设计合同的Action -->
+        <record id="action_design_contract_form" model="ir.actions.act_window">
+            <field name="name">设计合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="design_contract_tree"/>
+            <field name="domain">[('contract_type','=','design'),('state','in',['draft','confirm','wait_director','done'])]</field>
+            <field name="context">{'default_contract_type':'design'}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_design_tree_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="design_contract_tree"/>
+            <field name="act_window_id" ref="action_design_contract_form"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_design_form_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="design_contract_form"/>
+            <field name="act_window_id" ref="action_design_contract_form"/>
+        </record>
+
+        <!-- 设计合同的待我审批 -->
+        <record id="action_design_contract_form_filter" model="ir.actions.act_window">
+            <field name="name">设计合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="design_contract_tree"/>
+            <field name="domain">[('contract_type','=','design'),('state','in',['draft','confirm','wait_director','done'])]</field>
+            <field name="context">{'wkf_filter': 'MYTODO','default_contract_type':'design'}</field>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_design_tree_filter_view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="design_contract_tree"/>
+            <field name="act_window_id" ref="action_design_contract_form_filter"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_design_form_filter_view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="design_contract_form"/>
+            <field name="act_window_id" ref="action_design_contract_form_filter"/>
+        </record>
+        <!--TODO总包合同-->
+        <record id="wb_market_contract_form_view" model="ir.ui.view">
+            <field name="name">market.contract.form</field>
+            <field name="model">market.contract</field>
+            <field name="arch" type="xml">
+                <form string="Contract" >
+                    <header>
+                        <button name="market_contract_draft_confirm" string="提交" type="workflow_submit" states="draft" class="oe_highlight" groups="wise_project.wb_market_user"/>
+                        <button name="market_contract_market_dummy" string="市场同意" type="workflow_ok"  states="confirm" class="oe_highlight" groups="wise_project.wb_market_manager"/>
+                        <button name="market_contract_market_draft" string="拒绝" type="workflow_no" states="confirm" class="oe_highlight"
+                                groups="wise_project.wb_market_manager"/>
+                        <button name="market_contract_fee_dummy" string="费控同意" type="workflow_ok"  states="confirm" class="oe_highlight" 
+                                groups="wise_project.wb_fee_control_manager"/>
+                        <button name="market_contract_fee_draft" string="拒绝" type="workflow_no" states="confirm" class="oe_highlight"
+                                groups="wise_project.wb_fee_control_manager"/>
+                        <button name="market_contract_financial_dummy" string="财务同意" type="workflow_ok"  states="confirm" class="oe_highlight" groups="wise_project.wb_finance_manager"/>
+                        <button name="market_contract_financial_draft" string="拒绝" type="workflow_no" states="confirm" class="oe_highlight" groups="wise_project.wb_finance_manager"/>
+                        <button name='attachment_tree_view' type='object' string='合同附件'/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,done" 
+                               attrs="{'invisible': [('state','=','done')]}" />
+<!--                         <button name="wkf_running_done" string="结算" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/> -->
+                        <button name="wkf_running_done" string="完成" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <button name="wkf_running_cancle" string="取消" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" class="oe_highlight"/>
+                        <field name="state_running" widget="statusbar"   statusbar_visible="running,finished,cancel"
+                               attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                    </header>
+                    <sheet>
+                        <h1>
+                            <label string=""/>
+                            <field name="name" class="oe_inline" attrs="{'readonly':[('state','!=','draft')]}" placeholder="合同名称"/>
+                        </h1>
+                        <group colspan="4">
+                            <group >
+                                <field name="active" invisible="1"/>
+                            </group>
+                            <group colspan="2" col="4">
+                                <field name="code"/>
+                                <field name="project_id" readonly="1"/>
+                                <field name="party_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_a" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="party_b" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="headparty_b" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="currency_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="contract_amount" on_change='onchange_contract_amount(contract_amount)' attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="now_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                            <group colspan="2" col="4">
+<!--                                 <field name="advance_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_advance_paymentratio(advance_amount,now_amount)"/>
+                                <field name="advance_paymentratio" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="retention_amount" attrs="{'readonly':[('state','!=','draft')]}" on_change="onchange_retention_ratio(retention_amount,now_amount)"/>
+                                <field name="retention_ratio" attrs="{'readonly':[('state','!=','draft')]}"/> -->
+                                <field name="other_fees" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="otherfees_amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_person" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                <field name="input_date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            </group>
+                        </group>
+                    <notebook>
+                        <page string="合同产品明细">
+                            <field name="market_pr_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ProductContract" editable="bottom">
+                                    <field name="product_id" on_change="onchange_product_id(product_id,False, context)"/>
+                                    <field name="name"/>
+                                    <field name="product_qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="price_subtotal"/>
+                                    <field name="active" invisible="1"/>
+                                  </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="product_lines_total"/>
+                                </div>
+                                <field name="product_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>  
+                        </page>
+                        <page string="收款计划/实际收款">
+                            <field name="market_labor_line" attrs="{'readonly':[('state','!=','draft')]}" context="{'now_amount':now_amount}">
+                                <tree string="LaborContract" editable="bottom">
+                                    <field name="paymentitem_id"/>
+                                    <field name="payment_condition"/>
+                                    <field name="payment_date"/>
+                                    <field name="actual_payment" on_change="onchange_payment_ratio(actual_payment)" context="{'now_amount':now_amount}"/>
+                                    <field name="payment_ration"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="market_contract_id" on_change="onchange_market_contract_id(market_contract_id)" />
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="gathering_lines_total"/>
+                                </div>
+                                <field name="gathering_lines_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group> 
+                        </page>
+<!--                         <page string="实际收款">
+                            <field name="actual_line" readonly='1'>
+                                <tree string="ActualLine" editable="bottom">
+                                    <field name="market_contract_id" on_change="onchange_market_contract_id(market_contract_id)" />
+                                    <field name="project_id"/>
+                                    <field name="payment_name_id"/>
+                                    <field name="contract_total"/>
+                                    <field name="payment_total" on_change="onchange_payment_total(payment_total,contract_total)"/>
+                                    <field name="payment_tax"/>
+                                </tree>
+                            </field>
+                        </page> -->
+                        <page string="发票管理">
+                            <field name="invoice" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="Invoice" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_invoice"/>
+                                    <field name="number"/>
+                                    <field name="amount_total"/>
+                                    <field name="state" invisible='1'/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="合同变更">
+                            <field name="market_change_line" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="ChangeContract" editable="bottom">
+                                    <field name="code" />
+                                    <field name="name" />
+                                    <field name="originator_date" string="日期"/>
+                                    <field name="change_amount" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="文档附件明细">
+                            <field name="scon_docu">
+                                <tree string="tech document">
+                                    <field name="name"/>
+                                    <field name="datas_fname"/>
+                                    <field name="type"/>
+                                    <field name="create_uid"/>
+                                    <field name="create_date"/>
+                                    <field name="datas"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="备注">
+                            <field name="remark" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </page>
+                        <page string="审批记录">
+                            <field name="wkf_logs" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="wkf_logs" >
+                                    <field name="job_id" />
+                                    <field name="employee_id" />
+                                    <field name="time" />
+                                    <field name="status" />
+                                    <field name="info" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="wb_market_contract_tree_view" model="ir.ui.view">
+            <field name="name">Market Contract</field>
+            <field name="model">market.contract</field>
+            <field name="arch" type="xml">
+                <tree string="Contract">
+                    <field name="name" />
+                    <field name="project_id"/>
+                    <field name="contract_amount"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id='wb_market_contract_show' model='ir.actions.act_window'>
+            <field name='name'>商务合同</field>
+            <field name='type'>ir.actions.act_window</field>
+            <field name='res_model'>market.contract</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+
+        <record id="action_wb_market_contract_tree10" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="wb_market_contract_tree_view"/>
+            <field name="act_window_id" ref="wb_market_contract_show"/>
+        </record>
+        <record id="action_wb_market_contract_form10" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wb_market_contract_form_view"/>
+            <field name="act_window_id" ref="wb_market_contract_show"/>
+        </record>
+        
+        <!-- 待我审批 -->
+        <record id='wb_market_contract_show_filter' model='ir.actions.act_window'>
+            <field name='name'>商务合同</field>
+            <field name='type'>ir.actions.act_window</field>
+            <field name='res_model'>market.contract</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+            <field name="context">{'wkf_filter': 'MYTODO'}</field>
+        </record>
+
+        <record id="action_wb_market_contract_tree20" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="wb_market_contract_tree_view"/>
+            <field name="act_window_id" ref="wb_market_contract_show_filter"/>
+        </record>
+        <record id="action_wb_market_contract_form20" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wb_market_contract_form_view"/>
+            <field name="act_window_id" ref="wb_market_contract_show_filter"/>
+        </record>
+
+        <record id="wb_payment_item_form_view" model="ir.ui.view">
+            <field name="name">款项名称</field>
+            <field name="model">payment.item</field>
+            <field name="arch" type="xml">
+                <form string="PaymentItem" >
+                    <sheet>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="is_guarantee"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="wb_payment_item_tree_view" model="ir.ui.view">
+            <field name="name">款项名称</field>
+            <field name="model">payment.item</field>
+            <field name="arch" type="xml">
+                <tree string="PaymentItem" >
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="is_guarantee"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id='wb_payment_item_show' model='ir.actions.act_window'>
+            <field name='name'>款项名称</field>
+            <field name='type'>ir.actions.act_window</field>
+            <field name='res_model'>payment.item</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+
+        <record id="wb_inherit_department_view" model="ir.ui.view">
+            <field name="name">inherit department</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='manager_id']"  position="after">
+                        <field name="department_code" />
+                    </xpath>
+                </data>
+            </field>
+        </record> 
+
+        
+        <!--合同质保金Action-->
+        <record id="action_contract_form_guarantee_all_cost" model="ir.actions.act_window">
+            <field name="name">质保金已交合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="construction_contract_tree"/>
+            <field name="domain">[('state','=','done')]</field>
+            <field name="context">{'contract_guarantee': 'all_cost'}</field>
+        </record>
+
+        <record id="action_contract_form_guarantee_only_cost" model="ir.actions.act_window">
+            <field name="name">非质保金已交合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="construction_contract_tree"/>
+            <field name="domain">[('state','=','done')]</field>
+            <field name="context">{'contract_guarantee': 'only_cost'}</field>
+        </record>
+
+        <record id="action_contract_form_guarantee_less_cost" model="ir.actions.act_window">
+            <field name="name">金额未交齐合同</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">labor.contract</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="construction_contract_tree"/>
+            <field name="domain">[('state','=','done')]</field>
+            <field name="context">{'contract_guarantee': 'less_cost'}</field>
+        </record>        
+    </data>
+</openerp>

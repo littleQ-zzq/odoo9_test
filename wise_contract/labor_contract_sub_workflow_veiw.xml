@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="labor_contract_workflow" model="workflow">
+            <field name="name">Labor Contract</field>
+            <field name="osv">labor.contract</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <record id="act_labor_contract_draft" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">draft</field>
+            <field name="flow_start">True</field>
+            <field name="kind">function</field>
+            <field name="action_id" ref="wise_tools.action_wkf_notice"/>
+            <field name="action">wkf_draft()</field>
+        </record>
+
+        <record id="act_labor_contract_confirm" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">confirm</field>
+            <field name="split_mode">OR</field>
+            <field name="kind">function</field>
+            <field name="action">wkf_confirm()</field>
+        </record>
+
+
+        <record id="act_labor_contract_dummy_purchase_check" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">purchase</field>
+            <field name="action_id" ref="wise_tools.action_wkf_notice"/>
+        </record>
+
+        <record id="act_labor_contract_dummy_design_check" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">design</field>
+            <field name="action_id" ref="wise_tools.action_wkf_notice"/>
+        </record>
+
+        <record id="act_labor_contract_dummy_construct_check" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">construct</field>
+            <field name="action_id" ref="wise_tools.action_wkf_notice"/>
+        </record>
+
+
+
+        <record id="act_labor_contract_dummy_purchase" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="split_mode">OR</field>
+            <field name="name">dummy_purchase</field>
+        </record>
+
+        <record id="act_labor_contract_dummy_design" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="split_mode">OR</field>
+            <field name="name">dummy_design</field>
+        </record>
+
+        <record id="act_labor_contract_dummy_construct" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="split_mode">OR</field>
+            <field name="name">dummy_construct</field>
+        </record>
+
+
+
+        <record id="act_labor_contract_director_purchase" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">leader</field>
+            <field name="kind">function</field>
+            <field name="action_id" ref="wise_tools.action_wkf_notice"/>
+            <field name="action">wkf_director()</field>
+        </record>
+
+        <record id="act_labor_contract_director_design" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">leader</field>
+            <field name="kind">function</field>
+            <field name="action_id" ref="wise_tools.action_wkf_notice"/>
+            <field name="action">wkf_director()</field>
+        </record>
+
+        <record id="act_labor_contract_director_construct" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">leader</field>
+            <field name="kind">function</field>
+            <field name="action_id" ref="wise_tools.action_wkf_notice"/>
+            <field name="action">wkf_director()</field>
+        </record>
+
+
+        <record id="act_labor_contract_done" model="workflow.activity">
+            <field name="wkf_id" ref="labor_contract_workflow"/>
+            <field name="name">done</field>
+            <field name="kind">function</field>
+            <field name="flow_stop">True</field>
+            <field name="action">wkf_done()</field>
+        </record>
+
+
+
+        <!-- trans -->
+        <record id="trans_labor_contract_draft_confirm" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_draft"/>
+            <field name="act_to" ref="act_labor_contract_confirm"/>
+            <field name="signal">labor_contract_draft_confirm</field>
+        </record>
+
+
+        <record id="trans_labor_contract_confirm_purchase_check" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_confirm"/>
+            <field name="act_to" ref="act_labor_contract_dummy_purchase_check"/>
+            <field name="condition">(contract_type=='purchase')</field>
+        </record>
+
+        <record id="trans_labor_contract_confirm_design_check" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_confirm"/>
+            <field name="act_to" ref="act_labor_contract_dummy_design_check"/>
+            <field name="condition">(contract_type=='design')</field>
+        </record>
+
+        <record id="trans_labor_contract_confirm_construct_check" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_confirm"/>
+            <field name="act_to" ref="act_labor_contract_dummy_construct_check"/>
+            <field name="condition">(contract_type=='construct')</field>
+        </record>
+
+
+        <record id="trans_labor_contract_purchase_check_dummy" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_purchase_check"/>
+            <field name="act_to" ref="act_labor_contract_dummy_purchase"/>
+            <field name="group_id" ref="wise_project.wb_purchase_manager"/>
+            <field name="signal">labor_contract_purchase_check_dummy</field>
+        </record>
+
+        <record id="trans_labor_contract_design_check_dummy" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_design_check"/>
+            <field name="act_to" ref="act_labor_contract_dummy_design"/>
+            <field name="group_id" ref="wise_project.wb_design_lowN_manager"/>
+            <field name="signal">labor_contract_design_check_dummy</field>
+        </record>
+
+        <record id="trans_labor_contract_construct_check_dummy" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_construct_check"/>
+            <field name="act_to" ref="act_labor_contract_dummy_construct"/>
+            <field name="group_id" ref="wise_project.wb_construct_lowN_manager"/>
+            <field name="signal">labor_contract_construct_check_dummy</field>
+        </record>
+
+
+
+
+        <!-- purchase -->
+        <record id="trans_labor_contract_dummy_purchase_done" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_purchase"/>
+            <field name="act_to" ref="act_labor_contract_done"/>
+            <field name="condition">(contract_amount &lt; 100000)</field>
+        </record>
+
+        <record id="trans_labor_contract_dummy_purchase_draft" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_purchase"/>
+            <field name="act_to" ref="act_labor_contract_draft"/>
+            <field name="group_id" ref="wise_project.wb_purchase_manager"/>
+            <field name="signal">labor_contract_dummy_purchase_draft</field>
+        </record>
+
+        <record id="trans_labor_contract_dummy_purchase_director" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_purchase"/>
+            <field name="act_to" ref="act_labor_contract_director_purchase"/>
+            <field name="condition">(contract_amount &gt;= 100000)</field>
+        </record>
+
+        <record id="trans_labor_contract_purchase_director_done" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_director_purchase"/>
+            <field name="act_to" ref="act_labor_contract_done"/>
+            <field name="group_id" ref="wise_project.wb_leader"/>
+            <field name="signal">labor_contract_purchase_director_done</field>
+        </record>
+
+        <record id="trans_labor_contract_purchase_director_draft" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_director_purchase"/>
+            <field name="act_to" ref="act_labor_contract_draft"/>
+            <field name="group_id" ref="wise_project.wb_leader"/>
+            <field name="signal">labor_contract_purchase_director_draft</field>
+        </record>
+
+
+        <!-- design -->
+        <record id="trans_labor_contract_dummy_design_done" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_design"/>
+            <field name="act_to" ref="act_labor_contract_done"/>
+            <field name="condition">(contract_amount &lt; 100000)</field>
+        </record>
+
+        <record id="trans_labor_contract_dummy_design_draft" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_design"/>
+            <field name="act_to" ref="act_labor_contract_draft"/>
+            <field name="group_id" ref="wise_project.wb_design_lowN_manager"/>
+            <field name="signal">labor_contract_dummy_design_draft</field>
+        </record>
+
+        <record id="trans_labor_contract_dummy_design_director" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_design"/>
+            <field name="act_to" ref="act_labor_contract_director_design"/>
+            <field name="condition">(contract_amount &gt;= 100000)</field>
+        </record>
+
+        <record id="trans_labor_contract_design_director_done" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_director_design"/>
+            <field name="act_to" ref="act_labor_contract_done"/>
+            <field name="group_id" ref="wise_project.wb_leader"/>
+            <field name="signal">labor_contract_design_director_done</field>
+        </record>
+
+        <record id="trans_labor_contract_designdesign_director_draft" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_director_design"/>
+            <field name="act_to" ref="act_labor_contract_draft"/>
+            <field name="group_id" ref="wise_project.wb_leader"/>
+            <field name="signal">labor_contract_design_director_draft</field>
+        </record>
+
+
+        <!-- construct -->
+        <record id="trans_labor_contract_dummy_construct_done" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_construct"/>
+            <field name="act_to" ref="act_labor_contract_done"/>
+            <field name="condition">(contract_amount &lt; 100000)</field>
+        </record>
+
+        <record id="trans_labor_contract_dummy_construct_draft" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_construct"/>
+            <field name="act_to" ref="act_labor_contract_draft"/>
+            <field name="group_id" ref="wise_project.wb_construct_lowN_manager"/>
+            <field name="signal">labor_contract_dummy_construct_draft</field>
+        </record>
+
+        <record id="trans_labor_contract_dummy_construct_director" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_dummy_construct"/>
+            <field name="act_to" ref="act_labor_contract_director_construct"/>
+            <field name="condition">(contract_amount &gt;= 100000)</field>
+        </record>
+
+        <record id="trans_labor_contract_construct_director_done" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_director_construct"/>
+            <field name="act_to" ref="act_labor_contract_done"/>
+            <field name="group_id" ref="wise_project.wb_leader"/>
+            <field name="signal">labor_contract_construct_director_done</field>
+        </record>
+
+        <record id="trans_labor_contract_construct_director_draft" model="workflow.transition">
+            <field name="act_from" ref="act_labor_contract_director_construct"/>
+            <field name="act_to" ref="act_labor_contract_draft"/>
+            <field name="group_id" ref="wise_project.wb_leader"/>
+            <field name="signal">labor_contract_construct_director_draft</field>
+        </record>
+    </data>
+</openerp>
